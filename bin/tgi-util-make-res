@@ -68,6 +68,7 @@ function scanFolder(obj, folder) {
   }
 }
 function writeFiles() {
-  fs.writeFileSync(sourcePrefix + '.json', JSON.stringify(assets, null, 2));
-
+  var jsonPart = JSON.stringify(assets, null, 2);
+  fs.writeFileSync(sourcePrefix + '.json', jsonPart);
+  fs.writeFileSync(sourcePrefix + '.js', '// Autocreated with tgi-util-make-res\nvar res = ' + jsonPart + ';');
 }
