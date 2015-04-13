@@ -2,4 +2,72 @@
 
 'use strict';
 
-console.log('hello there world');
+var fs = require('fs');
+
+if (process.argv.length != 4) {
+  console.log('usage: tgi-util-make-res (source output prefix) (source asset folder)');
+  process.exit(0);
+}
+
+var sourcePrefix = process.argv[2];
+var assetsFolder = process.argv[3];
+
+console.log('Creating %s.js, updating %s.json, from folder %s...', sourcePrefix, sourcePrefix, assetsFolder);
+
+var assets = {};
+scanFolder(assets, assetsFolder);
+writeFiles();
+
+function scanFolder(obj, folder) {
+  obj._type = 'Folder';
+  var files = fs.readdirSync(folder);
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    var path = folder + '/' + file;
+    var stats = fs.statSync(path);
+
+    if (file[0] == '.')
+      continue;
+
+    if (stats.isDirectory()) {
+      obj[file] = {};
+      scanFolder(obj[file], path);
+      continue;
+    }
+
+    if (!stats.isFile())
+      continue;
+
+    var extension = file.split('.').pop().toUpperCase();
+    if (extension != 'PNG' && extension != 'JPG' && extension != 'MP3')
+      continue;
+
+
+    var baseFileName = file.substring(0, file.length - extension.length - 1);
+    var sequenceNumber = ''; // rightmost digits
+    for (var j = baseFileName.length - 1; j >= 0; j--) {
+      var digit = baseFileName[j];
+      if (digit >= '0' && digit <= '9')
+        sequenceNumber = digit + sequenceNumber;
+      else
+        break;
+    }
+    var baseStructure = baseFileName.substring(0, baseFileName.length - sequenceNumber.length);
+    obj[baseStructure] = obj[baseStructure] || {};
+    obj[baseStructure]._type = extension;
+    if (sequenceNumber.length) {
+      var frame = Number(sequenceNumber);
+      if (undefined === obj[baseStructure].firstFrame || frame < obj[baseStructure].firstFrame)
+        obj[baseStructure].firstFrame = frame;
+      if (undefined === obj[baseStructure].lastFrame || frame > obj[baseStructure].lastFrame)
+        obj[baseStructure].lastFrame = frame;
+      if (frame<10 && sequenceNumber.length>1)
+        obj[baseStructure].zeroPad = sequenceNumber.length;
+    } else {
+    }
+  }
+}
+function writeFiles() {
+  fs.writeFileSync(sourcePrefix + '.json', JSON.stringify(assets, null, 2));
+
+}

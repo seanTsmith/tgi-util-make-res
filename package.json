@@ -1,6 +1,6 @@
 {
   "name": "tgi-util-make-res",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "make res file",
   "contributors": [
     {
@@ -16,7 +16,7 @@
     "url": "https://github.com/tgi-io/tgi-util-make-res.git"
   },
   "bin": {
-    "tgi": "./bin/tgi-util-make-res"
+    "tgi-util-make-res": "./bin/tgi-util-make-res"
   },
   "keywords": [
     "javascript",
