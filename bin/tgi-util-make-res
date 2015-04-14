@@ -14,8 +14,10 @@ var assetsFolder = process.argv[3];
 
 console.log('Creating %s.js, updating %s.json, from folder %s...', sourcePrefix, sourcePrefix, assetsFolder);
 
-var assets = {};
-scanFolder(assets, assetsFolder);
+var obj = {};
+var assets = {_type:'Folder'};
+assets[assetsFolder] = obj;
+scanFolder(obj, assetsFolder);
 writeFiles();
 
 function scanFolder(obj, folder) {
