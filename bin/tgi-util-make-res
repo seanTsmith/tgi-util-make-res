@@ -15,7 +15,7 @@ var assetsFolder = process.argv[3];
 console.log('Creating %s.js, updating %s.json, from folder %s...', sourcePrefix, sourcePrefix, assetsFolder);
 
 var obj = {};
-var assets = {_type:'Folder'};
+var assets = {_type: 'Folder'};
 assets[assetsFolder] = obj;
 scanFolder(obj, assetsFolder);
 writeFiles();
@@ -41,13 +41,16 @@ function scanFolder(obj, folder) {
       continue;
 
     var extension = file.split('.').pop().toUpperCase();
-    if (extension != 'PNG' && extension != 'JPG' && extension != 'MP3')
-      continue;
 
+    var isGraphic = (extension == 'PNG' || extension == 'JPG');
+    var isSound = (extension == 'MP3' || extension == 'WAV');
+
+    if (!isSound && !isGraphic)
+      continue;
 
     var baseFileName = file.substring(0, file.length - extension.length - 1);
     var sequenceNumber = ''; // rightmost digits
-    for (var j = baseFileName.length - 1; j >= 0; j--) {
+    for (var j = baseFileName.length - 1; j >= 0 && !isSound; j--) {
       var digit = baseFileName[j];
       if (digit >= '0' && digit <= '9')
         sequenceNumber = digit + sequenceNumber;
@@ -63,7 +66,7 @@ function scanFolder(obj, folder) {
         obj[baseStructure].firstFrame = frame;
       if (undefined === obj[baseStructure].lastFrame || frame > obj[baseStructure].lastFrame)
         obj[baseStructure].lastFrame = frame;
-      if (frame<10 && sequenceNumber.length>1)
+      if (frame < 10 && sequenceNumber.length > 1)
         obj[baseStructure].zeroPad = sequenceNumber.length;
     } else {
     }
